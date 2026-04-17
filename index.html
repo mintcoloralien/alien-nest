@@ -1,1 +1,1731 @@
-PROBE
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alien Nest</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<link rel="stylesheet" as="style" onload="this.onload=null;this.rel='stylesheet'"
+  href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css"></noscript>
+<style>
+/* ═══════════════════════════════════════
+   TOSS-STYLE DESIGN SYSTEM  ·  B&W
+═══════════════════════════════════════ */
+:root {
+  --bg:     #F2F4F6;
+  --white:  #FFFFFF;
+  --f7:     #F7F8FA;
+  --line:   #E5E8EB;
+  --line2:  #D1D6DB;
+  --t3:     #8B95A1;
+  --t2:     #4E5968;
+  --t1:     #191F28;
+  --sw:     228px;
+  --sh:     28px;
+  --r-card: 16px;
+  --r-btn:  12px;
+  --r-pill: 99px;
+}
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html, body { height: 100%; }
+body {
+  font-family: 'Pretendard', -apple-system, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+  background: var(--bg);
+  color: var(--t1);
+  display: flex;
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+button { font-family: inherit; cursor: pointer; }
+a { text-decoration: none; color: inherit; }
+
+/* ─── Sidebar ───────────────────────── */
+.sb {
+  width: var(--sw);
+  background: var(--white);
+  border-right: 1px solid var(--line);
+  position: fixed; top:0; left:0; bottom:0;
+  display: flex; flex-direction: column;
+  overflow-y: auto; z-index: 200;
+}
+.sb-logo { padding: 22px 18px 16px; border-bottom: 1px solid var(--line); }
+.sb-logo h1 { font-size: 15px; font-weight: 800; letter-spacing: -.5px; color: var(--t1); }
+.sb-logo .sub { font-size: 11px; color: var(--t3); margin-top: 3px; font-weight: 500; }
+.sb-body { padding: 8px 10px; flex: 1; }
+.sb-sep { height: 1px; background: var(--line); margin: 6px 4px; }
+.nav {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 12px; border-radius: 10px; cursor: pointer;
+  font-size: 13px; font-weight: 600; color: var(--t2);
+  transition: background .12s, color .12s;
+  user-select: none; margin-bottom: 1px;
+}
+.nav:hover { background: var(--f7); color: var(--t1); }
+.nav.on { background: var(--t1); color: var(--white); }
+.nav .ic {
+  width: 20px; height: 20px; border-radius: 5px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 800; flex-shrink: 0;
+  background: var(--f7); color: var(--t2); border: 1px solid var(--line);
+  transition: background .12s, color .12s, border .12s;
+}
+.nav.on .ic { background: rgba(255,255,255,.15); color: var(--white); border-color: transparent; }
+
+/* ─── Main ──────────────────────────── */
+.main { margin-left: var(--sw); flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.pg { display: none; flex: 1; }
+.pg.on { display: flex; flex-direction: column; }
+
+/* ─── Page header ───────────────────── */
+.pg-head {
+  height: 56px; flex-shrink: 0;
+  display: flex; align-items: center; gap: 14px;
+  padding: 0 24px;
+  background: var(--white); border-bottom: 1px solid var(--line);
+}
+.pg-head h2 { font-size: 16px; font-weight: 800; letter-spacing: -.4px; }
+.date-nav { display: flex; align-items: center; gap: 6px; margin-left: auto; }
+.dn-arrow {
+  width: 30px; height: 30px; border: 1.5px solid var(--line);
+  border-radius: var(--r-btn); background: none; font-size: 16px;
+  color: var(--t2); display: flex; align-items: center; justify-content: center;
+  transition: all .12s; line-height: 1;
+}
+.dn-arrow:hover { background: var(--f7); border-color: var(--line2); }
+.dn-today {
+  padding: 5px 12px; border: 1.5px solid var(--line);
+  border-radius: var(--r-pill); background: none;
+  font-size: 12px; font-weight: 700; color: var(--t2); transition: all .12s;
+}
+.dn-today:hover { background: var(--f7); border-color: var(--line2); }
+.dn-label { font-size: 14px; font-weight: 700; min-width: 170px; text-align: center; }
+
+/* ─── Card ──────────────────────────── */
+.card { background: var(--white); border-radius: var(--r-card); padding: 20px; }
+.ct { font-size: 11px; font-weight: 700; color: var(--t3); text-transform: uppercase; letter-spacing: .7px; margin-bottom: 14px; }
+
+/* ─── Buttons ───────────────────────── */
+.btn { padding: 8px 16px; border-radius: var(--r-btn); font-size: 13px; font-weight: 700; border: none; transition: all .12s; font-family: inherit; }
+.btn-k  { background: var(--t1); color: var(--white); }
+.btn-k:hover { background: var(--t2); }
+.btn-o  { background: var(--f7); border: 1.5px solid var(--line); color: var(--t2); }
+.btn-o:hover { background: var(--line); }
+.btn-del { background: #FFF2F2; border: none; color: #C92A2A; }
+.btn-del:hover { background: #FFE3E3; }
+
+/* ─── Add btn ───────────────────────── */
+.add-btn {
+  width: 100%; border: 1.5px dashed var(--line2); border-radius: 10px;
+  padding: 8px; background: none; font-size: 12px; font-weight: 600;
+  color: var(--t3); margin-top: 8px; transition: all .12s; font-family: inherit;
+}
+.add-btn:hover { border-color: var(--t1); color: var(--t1); background: var(--f7); }
+
+/* ─── Del X ─────────────────────────── */
+.dx { background: none; border: none; color: var(--t3); font-size: 12px; padding: 2px 5px; opacity: 0; transition: opacity .1s; flex-shrink: 0; }
+*:hover > .dx, *:focus-within > .dx { opacity: 1; }
+
+/* ─── Textarea ──────────────────────── */
+.ita { flex: 1; border: none; outline: none; background: transparent; font-size: 13px; font-family: inherit; color: var(--t1); resize: none; overflow: hidden; line-height: 1.55; }
+.ita::placeholder { color: var(--line2); }
+
+/* ─── Todo row ──────────────────────── */
+.td-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--line); }
+.td-row:last-child { border-bottom: none; }
+.td-box { width: 18px; height: 18px; border: 2px solid var(--line2); border-radius: 5px; display: flex; align-items: center; justify-content: center; font-size: 10px; flex-shrink: 0; transition: all .12s; }
+.td-row.done .td-box { background: var(--t1); border-color: var(--t1); color: var(--white); }
+.td-row.done > span { text-decoration: line-through; color: var(--t3); }
+.td-badge { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: var(--r-pill); background: var(--f7); border: 1px solid var(--line); color: var(--t2); flex-shrink: 0; margin-left: auto; }
+
+/* ─── Modal ─────────────────────────── */
+.ov { position: fixed; inset: 0; background: rgba(0,0,0,.4); display: none; align-items: center; justify-content: center; z-index: 500; backdrop-filter: blur(4px); }
+.ov.on { display: flex; }
+.modal { background: var(--white); border-radius: 20px; padding: 24px; width: 320px; box-shadow: 0 20px 60px rgba(0,0,0,.2); animation: mup .15s ease; }
+@keyframes mup { from{transform:translateY(10px);opacity:0} to{transform:translateY(0);opacity:1} }
+.modal h3 { font-size: 16px; font-weight: 800; margin-bottom: 4px; letter-spacing: -.3px; }
+.modal .mtime { font-size: 12px; color: var(--t3); font-weight: 500; margin-bottom: 16px; }
+.modal input, .modal select { width: 100%; border: 1.5px solid var(--line); border-radius: 10px; padding: 10px 12px; font-size: 14px; font-family: inherit; outline: none; margin-bottom: 10px; background: var(--f7); color: var(--t1); transition: border .12s; }
+.modal input:focus, .modal select:focus { border-color: var(--t1); background: var(--white); }
+.mod-btns { display: flex; gap: 8px; margin-top: 4px; }
+.mod-btns .btn { flex: 1; text-align: center; padding: 10px; }
+
+/* ─── Scrollbar ─────────────────────── */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--line); border-radius: 2px; }
+
+/* ═══════════════════════════════════════
+   DETAIL MODAL  (Notion-style)
+═══════════════════════════════════════ */
+.detail-modal {
+  background: var(--white);
+  border-radius: 20px;
+  width: 660px;
+  max-height: 84vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 28px 90px rgba(0,0,0,.24);
+  animation: mup .18s ease;
+  overflow: hidden;
+  position: relative;
+}
+.dm-top {
+  padding: 20px 20px 0 22px;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+.dm-emoji-btn {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--t2);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 8px;
+  transition: background .12s, color .12s;
+  line-height: 1;
+  letter-spacing: -.5px;
+}
+.dm-emoji-btn:hover { color: var(--t1); }
+.dm-emoji-btn:hover { background: var(--f7); }
+.dm-close-btn {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: var(--t3);
+  font-size: 16px;
+  cursor: pointer;
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  transition: background .12s;
+}
+.dm-close-btn:hover { background: var(--f7); color: var(--t1); }
+.dm-title-wrap { padding: 10px 24px 0; flex-shrink: 0; }
+.dm-title-inp {
+  width: 100%;
+  border: none;
+  outline: none;
+  font-size: 26px;
+  font-weight: 800;
+  font-family: inherit;
+  color: var(--t1);
+  background: transparent;
+  letter-spacing: -.5px;
+  line-height: 1.3;
+}
+.dm-title-inp::placeholder { color: var(--line2); }
+.dm-meta-row {
+  padding: 8px 24px 4px;
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+}
+.dm-meta-chip {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: var(--r-pill);
+  background: var(--f7);
+  border: 1.5px solid var(--line);
+  color: var(--t2);
+}
+.dm-divider { border: none; border-top: 1px solid var(--line); margin: 6px 0 0; flex-shrink: 0; }
+.dm-body-inp {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.8;
+  color: var(--t1);
+  padding: 14px 24px 16px;
+  resize: none;
+  background: transparent;
+  min-height: 220px;
+  overflow-y: auto;
+}
+.dm-body-inp::placeholder { color: var(--line2); }
+.dm-footer {
+  padding: 12px 24px 18px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+  border-top: 1px solid var(--line);
+  flex-shrink: 0;
+}
+.dm-saved-lbl { font-size: 11px; color: var(--t3); font-weight: 600; margin-right: auto; opacity: 0; transition: opacity .4s; }
+.dm-saved-lbl.show { opacity: 1; }
+/* detail modal 안에서는 삭제 버튼도 무채색으로 */
+.detail-modal .btn-del {
+  background: var(--f7);
+  border: 1.5px solid var(--line2);
+  color: var(--t2);
+}
+.detail-modal .btn-del:hover {
+  background: var(--line);
+  color: var(--t1);
+}
+/* emoji picker */
+.dm-ep-wrap {
+  position: absolute;
+  top: 70px; left: 22px;
+  background: var(--white);
+  border: 1.5px solid var(--line);
+  border-radius: 14px;
+  padding: 10px;
+  display: none;
+  grid-template-columns: repeat(8,1fr);
+  gap: 2px;
+  box-shadow: 0 8px 32px rgba(0,0,0,.14);
+  z-index: 20;
+  width: 268px;
+}
+.dm-ep-wrap.on { display: grid; }
+.dm-ep-btn {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--t2);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px 4px;
+  border-radius: 6px;
+  transition: background .1s, color .1s;
+  text-align: center;
+  line-height: 1;
+}
+.dm-ep-btn:hover { background: var(--f7); color: var(--t1); }
+/* Memo card style */
+.memo-card {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 9px 11px;
+  border-radius: 10px;
+  border: 1.5px solid var(--line);
+  margin-bottom: 6px;
+  cursor: pointer;
+  transition: background .1s, border-color .1s;
+  background: var(--f7);
+}
+.memo-card:hover { background: var(--line); border-color: var(--line2); }
+.memo-card-emoji { font-size: 16px; flex-shrink: 0; }
+.memo-card-text { flex: 1; font-size: 13px; color: var(--t1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.memo-card-text.empty { color: var(--t3); font-style: italic; }
+.memo-card-del { background: none; border: none; color: var(--t3); font-size: 11px; padding: 2px 5px; opacity: 0; transition: opacity .1s; flex-shrink: 0; }
+.memo-card:hover .memo-card-del { opacity: 1; }
+
+/* ═══════════════════════════════════════
+   TODAY — Time Boxing
+═══════════════════════════════════════ */
+.today-body { display: flex; flex: 1; overflow: hidden; }
+.tb-left { width: 248px; flex-shrink: 0; border-right: 1px solid var(--line); overflow-y: auto; padding: 16px 14px; display: flex; flex-direction: column; gap: 16px; background: var(--white); }
+.tb-left h3 { font-size: 10px; font-weight: 800; color: var(--t3); text-transform: uppercase; letter-spacing: .8px; margin-bottom: 10px; }
+.note-area { min-height: 72px; padding: 11px 12px; border: 1.5px solid var(--line); border-radius: 12px; font-size: 13px; outline: none; line-height: 1.6; color: var(--t1); white-space: pre-wrap; cursor: text; transition: border .12s; font-family: inherit; }
+.note-area:focus { border-color: var(--t1); }
+.note-area:empty::before { content: attr(placeholder); color: var(--line2); pointer-events: none; }
+.pri-row { display: flex; align-items: flex-start; gap: 8px; padding: 3px 0; }
+.pri-num { width: 18px; height: 18px; background: var(--t1); color: var(--white); border-radius: 50%; font-size: 10px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 3px; }
+.dump-row { display: flex; align-items: flex-start; gap: 8px; padding: 4px 0; border-bottom: 1px solid var(--line); }
+.dump-row:last-of-type { border-bottom: none; }
+.dump-dot { width: 4px; height: 4px; background: var(--line2); border-radius: 50%; margin-top: 10px; flex-shrink: 0; }
+
+/* Time grid */
+.tb-right { flex: 1; overflow-y: auto; overflow-x: hidden; background: var(--white); position: relative; }
+.tb-grid-wrap { display: flex; min-height: 100%; position: relative; }
+.tb-axis { width: 56px; flex-shrink: 0; position: relative; border-right: 1px solid var(--line); }
+.tb-ax-lbl { position: absolute; right: 8px; font-size: 10px; font-weight: 600; color: var(--t3); transform: translateY(-50%); pointer-events: none; white-space: nowrap; line-height: 1; }
+.tb-ax-half { position: absolute; right: 8px; font-size: 9px; color: var(--line2); transform: translateY(-50%); pointer-events: none; white-space: nowrap; line-height: 1; }
+.tb-content { flex: 1; position: relative; cursor: crosshair; user-select: none; }
+.tb-hline { position: absolute; left: 0; right: 0; pointer-events: none; }
+.tb-hline.hour  { border-top: 1px solid var(--line); }
+.tb-hline.half  { border-top: 1px dashed #ECEEF1; }
+.tb-hline.quart { border-top: 1px dashed #F3F4F6; }
+.tb-ev { position: absolute; left: 6px; right: 6px; background: var(--t1); color: var(--white); border-radius: 10px; padding: 5px 10px; font-size: 12px; font-weight: 700; cursor: pointer; overflow: hidden; z-index: 3; transition: opacity .1s; box-shadow: 0 2px 8px rgba(0,0,0,.12); }
+/* 무채색 팔레트 — 이벤트 색상 구분용 (순수 회색 계열) */
+.tb-ev[data-ci="0"] { background: #1A1A1A; color: #fff; }
+.tb-ev[data-ci="1"] { background: #2E2E2E; color: #fff; }
+.tb-ev[data-ci="2"] { background: #444444; color: #fff; }
+.tb-ev[data-ci="3"] { background: #595959; color: #fff; }
+.tb-ev[data-ci="4"] { background: #6E6E6E; color: #fff; }
+.tb-ev[data-ci="5"] { background: #838383; color: #fff; }
+.tb-ev[data-ci="6"] { background: #989898; color: #111; }
+.tb-ev[data-ci="7"] { background: #B0B0B0; color: #111; }
+.tb-ev:hover { opacity: .82; }
+.tb-ev .ev-t  { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tb-ev .ev-tm { display: block; font-size: 10px; font-weight: 500; opacity: .65; margin-top: 1px; }
+.tb-drag-sel { position: absolute; left: 6px; right: 6px; background: rgba(25,31,40,.06); border: 2px dashed var(--line2); border-radius: 10px; z-index: 2; pointer-events: none; }
+.tb-now { position: absolute; left: 0; right: 0; height: 2px; background: var(--t1); z-index: 4; pointer-events: none; }
+.tb-now::before { content: ''; position: absolute; left: -4px; top: -5px; width: 12px; height: 12px; background: var(--t1); border-radius: 50%; }
+.tb-hint { font-size: 11px; color: var(--t3); font-weight: 500; flex-shrink: 0; }
+
+
+/* ═══════════════════════════════════════
+   SCHEDULE — Week / Month
+═══════════════════════════════════════ */
+.sch-body { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+.view-toggle { display: flex; background: var(--f7); border: 1.5px solid var(--line); border-radius: var(--r-pill); overflow: hidden; padding: 3px; gap: 2px; }
+.vt { padding: 5px 16px; border: none; background: none; font-size: 13px; font-weight: 700; color: var(--t3); font-family: inherit; border-radius: 99px; transition: all .15s; }
+.vt.on { background: var(--white); color: var(--t1); box-shadow: 0 1px 4px rgba(0,0,0,.1); }
+
+/* Week */
+.wv { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+.wv-grid { flex: 1; display: grid; grid-template-columns: repeat(7,1fr); overflow-y: auto; border-top: 1px solid var(--line); }
+.wv-day-col { border-right: 1px solid var(--line); display: flex; flex-direction: column; min-height: 100%; }
+.wv-day-col:last-child { border-right: none; }
+.wv-day-hd { padding: 14px 12px 10px; border-bottom: 1px solid var(--line); text-align: center; flex-shrink: 0; position: sticky; top: 0; background: var(--white); z-index: 2; cursor: pointer; }
+.wv-day-hd:hover { background: var(--f7); }
+.wd-name { font-size: 11px; font-weight: 700; color: var(--t3); letter-spacing: .5px; }
+.wd-num  { font-size: 22px; font-weight: 800; color: var(--t1); line-height: 1.2; margin-top: 2px; }
+.wv-day-col.today-col .wd-num { background: var(--t1); color: var(--white); width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; margin: 4px auto 0; }
+.wv-day-body { flex: 1; padding: 10px 8px 4px; display: flex; flex-direction: column; gap: 4px; }
+.wv-ev-chip { display: flex; align-items: center; gap: 7px; padding: 7px 9px; border-radius: 9px; background: var(--f7); cursor: pointer; transition: background .1s; border: none; font-family: inherit; text-align: left; width: 100%; }
+.wv-ev-chip:hover { background: var(--line); }
+.wv-ev-chip.done-chip { opacity: .5; }
+.wv-ev-chip.done-chip .wv-chip-txt { text-decoration: line-through; }
+.wv-chip-cb { width: 16px; height: 16px; border: 2px solid var(--line2); border-radius: 4px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 9px; transition: all .12s; }
+.wv-ev-chip.done-chip .wv-chip-cb { background: var(--t2); border-color: var(--t2); color: var(--white); }
+.wv-chip-txt { font-size: 12px; font-weight: 600; color: var(--t1); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.wv-chip-del { background: none; border: none; color: var(--t3); font-size: 11px; padding: 1px 3px; opacity: 0; transition: opacity .1s; }
+.wv-ev-chip:hover .wv-chip-del { opacity: 1; }
+.wv-add-row { padding: 4px 8px 12px; }
+.wv-add-btn { width: 100%; background: none; border: 1.5px dashed var(--line2); border-radius: 9px; padding: 7px 8px; font-size: 12px; font-weight: 600; color: var(--t3); font-family: inherit; transition: all .12s; text-align: center; }
+.wv-add-btn:hover { border-color: var(--t1); color: var(--t1); background: var(--f7); }
+
+/* Month */
+.mv { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+.mv-grid { flex: 1; display: flex; flex-direction: column; border-left: 1px solid var(--line); border-top: 1px solid var(--line); }
+.mv-heads { display: grid; grid-template-columns: repeat(7,1fr); background: var(--t1); flex-shrink: 0; }
+.mv-heads div { padding: 14px; text-align: center; font-size: 12px; font-weight: 800; color: var(--white); border-right: 1px solid rgba(255,255,255,.1); letter-spacing: .3px; }
+.mv-heads div:last-child { border-right: none; }
+.mv-body { flex: 1; display: grid; grid-template-columns: repeat(7,1fr); grid-template-rows: repeat(6,1fr); min-height: 0; }
+.mv-cell { border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 10px 10px 8px; cursor: pointer; transition: background .1s; display: flex; flex-direction: column; gap: 3px; overflow: hidden; }
+.mv-cell:nth-child(7n) { border-right: none; }
+.mv-cell:hover { background: var(--f7); }
+.mv-cell.today-cell .mv-num { background: var(--t1); color: var(--white); width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; }
+.mv-cell.dim .mv-num { color: var(--line2); }
+.mv-num { font-size: 14px; font-weight: 800; margin-bottom: 4px; flex-shrink: 0; }
+.mv-ev { background: var(--t1); color: var(--white); border-radius: 5px; font-size: 11px; font-weight: 600; padding: 2px 7px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mv-more { font-size: 10px; color: var(--t3); font-weight: 600; }
+
+
+/* ═══════════════════════════════════════
+   OTHER PAGES
+═══════════════════════════════════════ */
+.pw { padding: 24px 28px 60px; max-width: 920px; overflow-y: auto; flex: 1; }
+.ph2 { font-size: 20px; font-weight: 800; margin-bottom: 4px; letter-spacing: -.5px; }
+.ph-sub { font-size: 12px; color: var(--t3); font-weight: 500; margin-bottom: 22px; }
+.g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.dr-tabs { display: flex; gap: 6px; margin-bottom: 18px; }
+.dr-tab { padding: 6px 16px; border-radius: var(--r-pill); font-size: 13px; font-weight: 700; border: 1.5px solid var(--line); background: none; color: var(--t3); transition: all .12s; font-family: inherit; }
+.dr-tab.on { background: var(--t1); color: var(--white); border-color: var(--t1); }
+.dr-panel { display: none; }
+.dr-panel.on { display: block; }
+.log-entry { border-bottom: 1px solid var(--line); padding: 14px 0; }
+.log-entry:first-child { padding-top: 0; }
+.log-entry:last-child { border-bottom: none; }
+.log-date { font-size: 12px; font-weight: 800; margin-bottom: 8px; color: var(--t2); }
+.lf { margin-bottom: 10px; }
+.lf label { font-size: 10px; font-weight: 800; color: var(--t3); display: block; margin-bottom: 5px; text-transform: uppercase; letter-spacing: .5px; }
+.lf input, .lf textarea, .lf select { width: 100%; border: 1.5px solid var(--line); border-radius: 10px; padding: 9px 12px; font-size: 13px; font-family: inherit; color: var(--t1); outline: none; resize: none; background: var(--f7); transition: border .12s; }
+.lf input:focus, .lf textarea:focus { border-color: var(--t1); background: var(--white); }
+.lk-item { display: flex; align-items: center; gap: 11px; padding: 10px 0; border-bottom: 1px solid var(--line); cursor: pointer; transition: opacity .1s; }
+.lk-item:last-child { border-bottom: none; }
+.lk-item:hover { opacity: .6; }
+.lk-ic { width: 32px; height: 32px; background: var(--f7); border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; flex-shrink: 0; border: 1px solid var(--line); color: var(--t2); }
+.db-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; }
+.db-card { border-radius: var(--r-card); padding: 20px; background: var(--white); cursor: pointer; transition: box-shadow .15s, transform .15s; border: 1.5px solid var(--line); }
+.db-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,.08); transform: translateY(-2px); }
+.db-ic   { font-size: 20px; font-weight: 800; margin-bottom: 10px; color: var(--t2); }
+.db-name { font-size: 14px; font-weight: 800; margin-bottom: 4px; }
+.db-cnt  { font-size: 12px; color: var(--t3); font-weight: 600; }
+
+/* ═══════════════════════════════════════
+   SYNC STATUS
+═══════════════════════════════════════ */
+.sb-footer { padding: 12px 18px 14px; border-top: 1px solid var(--line); flex-shrink: 0; }
+.sync-row  { display: flex; align-items: center; gap: 7px; }
+.sync-dot  { width: 7px; height: 7px; border-radius: 50%; background: #95a5a6; flex-shrink: 0; transition: background .4s; }
+.sync-lbl  { font-size: 10px; color: var(--t3); font-weight: 600; }
+
+/* ═══════════════════════════════════════
+   MOBILE MENU (hamburger + backdrop)
+═══════════════════════════════════════ */
+.mb-menu {
+  display: none;
+  position: fixed;
+  top: 11px; left: 12px;
+  z-index: 201;
+  width: 38px; height: 38px;
+  border: 1.5px solid var(--line);
+  border-radius: 11px;
+  background: var(--white);
+  color: var(--t1);
+  font-size: 16px;
+  line-height: 1;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,.06);
+  transition: background .12s, border-color .12s;
+}
+.mb-menu:hover { background: var(--f7); border-color: var(--line2); }
+.mb-menu:active { background: var(--line); }
+.sb-backdrop {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.38);
+  backdrop-filter: blur(2px);
+  z-index: 199;
+  animation: fadeIn .18s ease;
+}
+.sb-backdrop.on { display: block; }
+@keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
+
+/* ═══════════════════════════════════════
+   MOBILE — ≤ 768px
+═══════════════════════════════════════ */
+@media (max-width: 768px) {
+  /* Sidebar becomes slide-out drawer */
+  .sb {
+    width: 248px;
+    transform: translateX(-100%);
+    transition: transform .22s ease;
+    box-shadow: 4px 0 24px rgba(0,0,0,.18);
+  }
+  .sb.open { transform: translateX(0); }
+
+  /* Main takes full width */
+  .main { margin-left: 0; width: 100%; min-width: 0; }
+
+  /* Hamburger visible on mobile */
+  .mb-menu { display: flex; }
+
+  /* Page header — leave room for fixed hamburger on the left */
+  .pg-head {
+    height: auto;
+    min-height: 58px;
+    padding: 10px 14px 10px 60px;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .pg-head h2 { font-size: 15px; }
+  .tb-hint { display: none; }
+
+  /* Pages without .pg-head (Work/Study/Memo/Daily/Routine/DB) also need top-left clearance */
+  .pw { padding: 60px 14px 72px; }
+
+  /* Date nav compacts */
+  .date-nav { gap: 4px; margin-left: auto; }
+  .dn-arrow { width: 30px; height: 30px; font-size: 15px; }
+  .dn-today { padding: 4px 10px; font-size: 11px; }
+  .dn-label { font-size: 12px; min-width: 0; max-width: 150px; font-weight: 700; }
+
+  /* View toggle (Week/Month) */
+  .view-toggle { order: 99; width: 100%; justify-content: center; }
+  .vt { padding: 5px 18px; font-size: 12px; flex: 1; }
+
+  /* ── TODAY: stack vertically ── */
+  .today-body { flex-direction: column; overflow: auto; }
+  .tb-left {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid var(--line);
+    padding: 14px 14px;
+    gap: 14px;
+    overflow: visible;
+  }
+  .tb-right {
+    min-height: 70vh;
+    overflow: visible;
+  }
+  .tb-axis { width: 44px; }
+  .tb-ax-lbl { right: 6px; font-size: 9px; }
+  .tb-ax-half, .tb-ax-quart { display: none; }
+  .tb-ev { padding: 4px 8px; font-size: 11px; border-radius: 8px; }
+  .tb-ev .ev-tm { font-size: 9px; }
+
+  /* ── SCHEDULE: Week horizontal scroll ── */
+  .wv-grid {
+    display: flex;
+    overflow-x: auto;
+    overflow-y: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+  }
+  .wv-day-col {
+    min-width: 48vw;
+    flex-shrink: 0;
+    scroll-snap-align: start;
+  }
+  .wv-day-hd { padding: 10px 8px 8px; }
+  .wd-num { font-size: 18px; }
+  .wv-day-col.today-col .wd-num { width: 30px; height: 30px; font-size: 14px; }
+
+  /* ── SCHEDULE: Month compact ── */
+  .mv-heads div { padding: 9px 4px; font-size: 10px; }
+  .mv-cell { padding: 5px 4px 4px; gap: 2px; }
+  .mv-num { font-size: 11px; margin-bottom: 2px; }
+  .mv-ev { font-size: 9px; padding: 1px 4px; border-radius: 3px; }
+  .mv-cell.today-cell .mv-num { width: 22px; height: 22px; font-size: 10px; }
+  .mv-more { font-size: 9px; }
+
+  /* ── Other pages (pw) ── */
+  .ph2 { font-size: 19px; }
+  .ph-sub { font-size: 12px; margin-bottom: 16px; }
+  .card { padding: 16px 14px; border-radius: 14px; }
+
+  /* 2-col grid → 1 col */
+  .g2 { grid-template-columns: 1fr; gap: 12px; }
+
+  /* 3-col DB → 2 col */
+  .db-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .db-card { padding: 16px 14px; }
+
+  /* Inline 3-col layout in Daily Record */
+  #dr-personal .card > div[style*="grid-template-columns:1fr 1fr 1fr"],
+  #dr-personal .card > div[style*="grid-template-columns: 1fr 1fr 1fr"] {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  /* Daily Record tabs scroll */
+  .dr-tabs { overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 4px; }
+  .dr-tab { flex-shrink: 0; }
+
+  /* Modals */
+  .modal {
+    width: calc(100% - 32px);
+    max-width: 360px;
+    padding: 22px 20px;
+  }
+  .detail-modal {
+    width: calc(100% - 16px);
+    max-width: 560px;
+    max-height: 94vh;
+    border-radius: 16px;
+  }
+  .dm-top { padding: 16px 14px 0 16px; }
+  .dm-emoji-btn { font-size: 24px; }
+  .dm-title-wrap { padding: 10px 18px 0; }
+  .dm-title-inp { font-size: 22px; }
+  .dm-meta-row { padding: 8px 18px 4px; }
+  .dm-body-inp { padding: 14px 18px 16px; font-size: 14px; min-height: 180px; }
+  .dm-footer { padding: 12px 18px 16px; }
+  .dm-ep-wrap {
+    left: 14px; right: 14px; width: auto;
+    grid-template-columns: repeat(8, 1fr);
+  }
+
+  /* Input/button touch targets */
+  .btn { padding: 9px 16px; font-size: 13px; }
+  .modal input, .modal select, .lf input, .lf textarea, .lf select {
+    font-size: 16px;  /* ≥16px prevents iOS auto-zoom on focus */
+  }
+}
+
+/* ═══════════════════════════════════════
+   MOBILE — ≤ 480px (very small)
+═══════════════════════════════════════ */
+@media (max-width: 480px) {
+  .db-grid { grid-template-columns: 1fr; }
+  .dn-label { max-width: 110px; font-size: 11px; }
+  .dn-today { padding: 4px 8px; font-size: 10px; }
+  .pg-head h2 { font-size: 14px; }
+  #dr-personal .card > div[style*="grid-template-columns:1fr 1fr 1fr"],
+  #dr-personal .card > div[style*="grid-template-columns: 1fr 1fr 1fr"] {
+    grid-template-columns: 1fr !important;
+  }
+  .wv-day-col { min-width: 72vw; }
+  .dm-ep-wrap { grid-template-columns: repeat(6, 1fr); }
+}
+
+</style>
+</head>
+<body>
+
+<!-- Mobile hamburger (fixed top-left, visible only on mobile) -->
+<button class="mb-menu" id="mb-menu" onclick="toggleSb()" aria-label="메뉴 열기">☰</button>
+<div class="sb-backdrop" id="sb-backdrop" onclick="closeSb()"></div>
+
+<!-- ══════════ SIDEBAR ══════════ -->
+<nav class="sb" id="sb">
+  <div class="sb-logo">
+    <h1>✦ Alien Nest</h1>
+    <div class="sub">My personal workspace</div>
+  </div>
+  <div class="sb-body">
+    <div class="nav on" id="n-today"   onclick="go('today')">  <span class="ic">○</span><span>Today</span></div>
+    <div class="nav"    id="n-sch"     onclick="go('sch')">    <span class="ic">▦</span><span>Schedule</span></div>
+    <div class="sb-sep"></div>
+    <div class="nav"    id="n-work"    onclick="go('work')">   <span class="ic">◇</span><span>Work</span></div>
+    <div class="nav"    id="n-study"   onclick="go('study')">  <span class="ic">△</span><span>Study</span></div>
+    <div class="sb-sep"></div>
+    <div class="nav"    id="n-memo"    onclick="go('memo')">   <span class="ic">#</span><span>Memo</span></div>
+    <div class="nav"    id="n-daily"   onclick="go('daily')">  <span class="ic">≡</span><span>Daily Record</span></div>
+    <div class="nav"    id="n-routine" onclick="go('routine')"><span class="ic">↻</span><span>Routine</span></div>
+    <div class="sb-sep"></div>
+    <div class="nav"    id="n-db"      onclick="go('db')">     <span class="ic">▤</span><span>Database</span></div>
+  </div>
+  <div class="sb-footer">
+    <div class="sync-row">
+      <div class="sync-dot" id="sync-status"></div>
+      <span class="sync-lbl" id="sync-label">로컬 저장</span>
+    </div>
+  </div>
+</nav>
+
+<main class="main">
+
+<!-- TODAY -->
+<div class="pg on" id="pg-today">
+  <div class="pg-head">
+    <h2>Today</h2>
+    <span class="tb-hint">드래그하여 일정 추가</span>
+    <div class="date-nav">
+      <button class="dn-arrow" onclick="moveDay(-1)">‹</button>
+      <button class="dn-today" onclick="gotoToday()">오늘</button>
+      <span class="dn-label" id="today-label"></span>
+      <button class="dn-arrow" onclick="moveDay(1)">›</button>
+    </div>
+  </div>
+  <div class="today-body">
+    <div class="tb-left">
+      <div>
+        <h3>— Note</h3>
+        <div class="note-area" id="note-el" contenteditable="true" placeholder="메모나 글귀를 적어보세요…"></div>
+      </div>
+      <div>
+        <h3>◎ Top Priorities</h3>
+        <div class="pri-row"><div class="pri-num">1</div><textarea class="ita" rows="1" placeholder="첫 번째 우선순위…" oninput="rz(this);savePri()" data-pi="0"></textarea></div>
+        <div class="pri-row"><div class="pri-num">2</div><textarea class="ita" rows="1" placeholder="두 번째 우선순위…" oninput="rz(this);savePri()" data-pi="1"></textarea></div>
+        <div class="pri-row"><div class="pri-num">3</div><textarea class="ita" rows="1" placeholder="세 번째 우선순위…" oninput="rz(this);savePri()" data-pi="2"></textarea></div>
+      </div>
+      <div>
+        <h3>◈ Brain Dump</h3>
+        <div id="dump-list"></div>
+        <button class="add-btn" onclick="addDump()">+ 생각 추가</button>
+      </div>
+    </div>
+    <div class="tb-right" id="tb-right">
+      <div class="tb-grid-wrap">
+        <div class="tb-axis" id="tb-axis"></div>
+        <div class="tb-content" id="tb-content"
+          onmousedown="tbDown(event)"
+          onmousemove="tbMove(event)"
+          onmouseup="tbUp(event)"
+          onmouseleave="tbLeave(event)"
+        ></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- SCHEDULE -->
+<div class="pg" id="pg-sch">
+  <div class="pg-head">
+    <h2>Schedule</h2>
+    <div class="view-toggle">
+      <button class="vt on" id="vt-wk" onclick="setView('week')">Week</button>
+      <button class="vt"    id="vt-mo" onclick="setView('month')">Month</button>
+    </div>
+    <div class="date-nav">
+      <button class="dn-arrow" onclick="schPrev()">‹</button>
+      <button class="dn-today" onclick="schToday()">오늘</button>
+      <span class="dn-label" id="sch-label"></span>
+      <button class="dn-arrow" onclick="schNext()">›</button>
+    </div>
+  </div>
+  <div class="sch-body">
+    <div class="wv" id="wv">
+      <div class="wv-grid" id="wv-grid"></div>
+    </div>
+    <div class="mv" id="mv" style="display:none;">
+      <div class="mv-grid">
+        <div class="mv-heads"><div>일</div><div>월</div><div>화</div><div>수</div><div>목</div><div>금</div><div>토</div></div>
+        <div class="mv-body" id="mv-body"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- WORK -->
+<div class="pg" id="pg-work">
+  <div class="pw">
+    <div class="ph2">Work</div>
+    <div class="ph-sub">Work Schedule · YouTube · Online Business</div>
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+          <div class="ct" style="margin:0;">Work Schedule</div>
+          <button class="btn btn-k" style="padding:6px 13px;font-size:12px;" onclick="openTodoMod('work')">+ 할 일</button>
+        </div>
+        <div id="work-todos"></div>
+      </div>
+      <div class="g2">
+        <div class="card"><div class="ct">WEK YouTube</div><div id="wek-list"></div><button class="add-btn" onclick="addIdea('wek')">+ 아이디어</button></div>
+        <div class="card"><div class="ct">우주지르</div><div id="space-list"></div><button class="add-btn" onclick="addIdea('space')">+ 아이디어</button></div>
+      </div>
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+          <div class="ct" style="margin:0;">Online Business</div>
+          <button class="btn btn-k" style="padding:6px 13px;font-size:12px;" onclick="openTodoMod('biz')">+ 추가</button>
+        </div>
+        <div id="biz-todos"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- STUDY -->
+<div class="pg" id="pg-study">
+  <div class="pw">
+    <div class="ph2">Study</div>
+    <div class="ph-sub">Assignment Schedule · Study Sites</div>
+    <div class="g2">
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+          <div class="ct" style="margin:0;">Assignment Schedule</div>
+          <button class="btn btn-k" style="padding:6px 13px;font-size:12px;" onclick="openAssignMod()">+ 과제</button>
+        </div>
+        <div id="assign-list"></div>
+      </div>
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+          <div class="ct" style="margin:0;">Study Sites</div>
+          <button class="btn btn-k" style="padding:6px 13px;font-size:12px;" onclick="openLinkMod()">+ 링크</button>
+        </div>
+        <div id="study-links">
+          <a class="lk-item" href="https://plato.pusan.ac.kr/" target="_blank"><div class="lk-ic">P</div><div><div style="font-weight:700;font-size:13px;">PLATO</div><div style="font-size:11px;color:var(--t3);">부산대 스마트교육플랫폼</div></div></a>
+          <a class="lk-item" href="https://gplab.pusan.ac.kr/gplab/index.do" target="_blank"><div class="lk-ic">G</div><div><div style="font-weight:700;font-size:13px;">일반물리학실험실</div><div style="font-size:11px;color:var(--t3);">gplab.pusan.ac.kr</div></div></a>
+          <a class="lk-item" href="https://cafe.naver.com/christinej" target="_blank"><div class="lk-ic">LC</div><div><div style="font-weight:700;font-size:13px;">토익 LC</div><div style="font-size:11px;color:var(--t3);">cafe.naver.com/christinej</div></div></a>
+          <a class="lk-item" href="https://cafe.naver.com/chachatoeic" target="_blank"><div class="lk-ic">RC</div><div><div style="font-weight:700;font-size:13px;">토익 RC</div><div style="font-size:11px;color:var(--t3);">cafe.naver.com/chachatoeic</div></div></a>
+          <a class="lk-item" href="https://pnu.ttceducation.net/campusedu/" target="_blank"><div class="lk-ic">언</div><div><div style="font-weight:700;font-size:13px;">부산대 언어교육원</div><div style="font-size:11px;color:var(--t3);">pnu.ttceducation.net</div></div></a>
+        </div>
+        <div id="custom-links"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- MEMO -->
+<div class="pg" id="pg-memo">
+  <div class="pw">
+    <div class="ph2">Memo</div>
+    <div class="ph-sub">빠른 메모패드</div>
+    <div class="g2">
+      <div class="card"><div class="ct">긴급 / 중요</div><div id="m-urgent"></div><button class="add-btn" onclick="addMemo('urgent')">+ 추가</button></div>
+      <div class="card"><div class="ct">아이디어</div><div id="m-ideas"></div><button class="add-btn" onclick="addMemo('ideas')">+ 추가</button></div>
+      <div class="card"><div class="ct">나중에 볼 것</div><div id="m-later"></div><button class="add-btn" onclick="addMemo('later')">+ 추가</button></div>
+      <div class="card"><div class="ct">링크 모음</div><div id="m-links"></div><button class="add-btn" onclick="addMemo('links')">+ 추가</button></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- DAILY RECORD -->
+<div class="pg" id="pg-daily">
+  <div class="pw">
+    <div class="ph2">Daily Record</div>
+    <div class="ph-sub">매일의 기록</div>
+    <div class="dr-tabs">
+      <button class="dr-tab on" onclick="drTab('personal',this)">Personal</button>
+      <button class="dr-tab"    onclick="drTab('creator',this)">Creator</button>
+      <button class="dr-tab"    onclick="drTab('analysis',this)">Analysis</button>
+    </div>
+    <div class="dr-panel on" id="dr-personal">
+      <div class="card" style="margin-bottom:14px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+          <div class="ct" style="margin:0;">오늘의 기록 — <span id="dr-today"></span></div>
+          <button class="btn btn-k" onclick="saveDR('personal')">저장</button>
+        </div>
+        <div class="lf"><label>오늘의 한 마디</label><input id="p-quote" type="text" placeholder="오늘 하루를 한 문장으로…"></div>
+        <div class="lf"><label>오늘 한 일</label><textarea id="p-done" rows="3" placeholder="완료한 일들…"></textarea></div>
+        <div class="lf"><label>생각 / 감정</label><textarea id="p-thoughts" rows="2" placeholder="오늘 든 생각…"></textarea></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
+          <div class="lf"><label>MVP 순간</label><input id="p-mvp" type="text"></div>
+          <div class="lf"><label>에너지 (1–10)</label><input id="p-energy" type="number" min="1" max="10" placeholder="7"></div>
+          <div class="lf"><label>수면</label><input id="p-sleep" type="text" placeholder="7h 30m"></div>
+        </div>
+      </div>
+      <div class="card"><div class="ct">과거 기록</div><div id="p-past"></div></div>
+    </div>
+    <div class="dr-panel" id="dr-creator">
+      <div class="card" style="margin-bottom:14px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+          <div class="ct" style="margin:0;">Creator 일지</div>
+          <button class="btn btn-k" onclick="saveDR('creator')">저장</button>
+        </div>
+        <div class="lf"><label>오늘 제작한 콘텐츠</label><input id="c-content" type="text" placeholder="영상 / 글 / 아이디어…"></div>
+        <div class="lf"><label>성과 메모</label><textarea id="c-result" rows="2" placeholder="조회수, 반응, 피드백…"></textarea></div>
+        <div class="lf"><label>다음 아이디어</label><textarea id="c-next" rows="2" placeholder="다음에 만들고 싶은 것…"></textarea></div>
+      </div>
+      <div class="card"><div class="ct">과거 기록</div><div id="c-past"></div></div>
+    </div>
+    <div class="dr-panel" id="dr-analysis">
+      <div class="card" style="margin-bottom:14px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+          <div class="ct" style="margin:0;">Analysis 일지</div>
+          <button class="btn btn-k" onclick="saveDR('analysis')">저장</button>
+        </div>
+        <div class="lf"><label>분석 주제</label><input id="a-topic" type="text" placeholder="오늘 분석한 주제…"></div>
+        <div class="lf"><label>인사이트</label><textarea id="a-insight" rows="3" placeholder="발견한 인사이트…"></textarea></div>
+        <div class="lf"><label>액션 아이템</label><textarea id="a-action" rows="2" placeholder="이 인사이트로 무엇을 할지…"></textarea></div>
+      </div>
+      <div class="card"><div class="ct">과거 기록</div><div id="a-past"></div></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ROUTINE -->
+<div class="pg" id="pg-routine">
+  <div class="pw">
+    <div class="ph2">Routine</div>
+    <div class="ph-sub">이번 주 · 이번 달</div>
+    <div class="g2">
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+          <div class="ct" style="margin:0;">이번 주 루틴</div>
+          <button class="btn btn-k" style="padding:6px 13px;font-size:12px;" onclick="openRtMod('week')">+ 추가</button>
+        </div>
+        <div id="wk-rt"></div>
+      </div>
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+          <div class="ct" style="margin:0;">이번 달 루틴</div>
+          <button class="btn btn-k" style="padding:6px 13px;font-size:12px;" onclick="openRtMod('month')">+ 추가</button>
+        </div>
+        <div id="mo-rt"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- DATABASE -->
+<div class="pg" id="pg-db">
+  <div class="pw">
+    <div class="ph2">Database</div>
+    <div class="ph-sub">모든 데이터의 허브</div>
+    <div class="db-grid">
+      <div class="db-card" onclick="go('work')">   <div class="db-ic">≡</div><div class="db-name">할 일</div>  <div class="db-cnt" id="db-c1"></div></div>
+      <div class="db-card" onclick="go('today')">  <div class="db-ic">○</div><div class="db-name">일정</div>  <div class="db-cnt" id="db-c2"></div></div>
+      <div class="db-card" onclick="go('routine')"><div class="db-ic">↻</div><div class="db-name">루틴</div>  <div class="db-cnt" id="db-c3"></div></div>
+      <div class="db-card" onclick="go('memo')">   <div class="db-ic">#</div> <div class="db-name">메모</div>  <div class="db-cnt" id="db-c4"></div></div>
+      <div class="db-card" onclick="go('daily')">  <div class="db-ic">≡</div><div class="db-name">일지</div>  <div class="db-cnt" id="db-c5"></div></div>
+      <div class="db-card" onclick="go('work')">   <div class="db-ic">◇</div><div class="db-name">Work</div> <div class="db-cnt" id="db-c6"></div></div>
+    </div>
+  </div>
+</div>
+</main>
+
+<!-- MODALS -->
+<div class="ov" id="ov-ev" onclick="if(event.target===this)closeEvMod()">
+  <div class="modal">
+    <h3 id="ev-mod-h">일정 추가</h3>
+    <div class="mtime" id="ev-mod-t"></div>
+    <input type="text" id="ev-name" placeholder="일정 이름을 입력하세요">
+    <div class="mod-btns">
+      <button class="btn btn-o" onclick="closeEvMod()">취소</button>
+      <button class="btn btn-del" id="ev-del-btn" style="display:none" onclick="deleteEv()">삭제</button>
+      <button class="btn btn-k" onclick="saveEv()">저장</button>
+    </div>
+  </div>
+</div>
+<div class="ov" id="ov-td" onclick="if(event.target===this)closeTodoMod()">
+  <div class="modal">
+    <h3>할 일 추가</h3><div class="mtime"></div>
+    <input type="text" id="td-name" placeholder="할 일 이름을 입력하세요">
+    <select id="td-tag"><option>일반</option><option>긴급</option><option>진행중</option><option>대기</option></select>
+    <div class="mod-btns">
+      <button class="btn btn-o" onclick="closeTodoMod()">취소</button>
+      <button class="btn btn-k" onclick="saveTodo()">추가</button>
+    </div>
+  </div>
+</div>
+<div class="ov" id="ov-as" onclick="if(event.target===this)closeAssignMod()">
+  <div class="modal">
+    <h3>과제 추가</h3><div class="mtime"></div>
+    <input type="text" id="as-name" placeholder="과목 / 과제명을 입력하세요">
+    <input type="date"  id="as-due">
+    <div class="mod-btns">
+      <button class="btn btn-o" onclick="closeAssignMod()">취소</button>
+      <button class="btn btn-k" onclick="saveAssign()">추가</button>
+    </div>
+  </div>
+</div>
+<div class="ov" id="ov-lk" onclick="if(event.target===this)closeLinkMod()">
+  <div class="modal">
+    <h3>링크 추가</h3><div class="mtime"></div>
+    <input type="text" id="lk-name" placeholder="사이트 이름">
+    <input type="url"  id="lk-url"  placeholder="https://…">
+    <div class="mod-btns">
+      <button class="btn btn-o" onclick="closeLinkMod()">취소</button>
+      <button class="btn btn-k" onclick="saveLink()">추가</button>
+    </div>
+  </div>
+</div>
+<div class="ov" id="ov-rt" onclick="if(event.target===this)closeRtMod()">
+  <div class="modal">
+    <h3>루틴 추가</h3><div class="mtime"></div>
+    <input type="text" id="rt-name" placeholder="루틴 이름">
+    <input type="text" id="rt-time" placeholder="시간 (예: 07:00)">
+    <div class="mod-btns">
+      <button class="btn btn-o" onclick="closeRtMod()">취소</button>
+      <button class="btn btn-k" onclick="saveRt()">추가</button>
+    </div>
+  </div>
+</div>
+
+<!-- DETAIL MODAL (Notion-style) -->
+<div class="ov" id="ov-detail" onclick="if(event.target===this)closeDetail()">
+  <div class="detail-modal">
+    <div class="dm-top">
+      <button class="dm-emoji-btn" id="dm-emoji-btn" onclick="toggleEmojiPick()">○</button>
+      <button class="dm-close-btn" onclick="closeDetail()">✕</button>
+    </div>
+    <div class="dm-ep-wrap" id="dm-ep-wrap"></div>
+    <div class="dm-title-wrap">
+      <input class="dm-title-inp" id="dm-title-inp" placeholder="제목 없음">
+    </div>
+    <div class="dm-meta-row" id="dm-meta-row"></div>
+    <div class="dm-divider"></div>
+    <textarea class="dm-body-inp" id="dm-body-inp" placeholder="내용을 자유롭게 적어보세요…&#10;&#10;아이디어, 링크, 메모, 계획 등 무엇이든 OK"></textarea>
+    <div class="dm-footer">
+      <span class="dm-saved-lbl" id="dm-saved-lbl">✓ 저장됨</span>
+      <button class="btn btn-del" onclick="detailDelete()">삭제</button>
+      <button class="btn btn-k" onclick="detailSave()">저장</button>
+    </div>
+  </div>
+</div>
+
+
+<script>
+// ── Supabase 설정 ────────────────────────────
+const SUPABASE_URL      = 'https://dgjzqiwnczbxmetomxdv.supabase.co';  // ← 여기 교체
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRnanpxaXduY3pieG1ldG9teGR2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNjQ5NDUsImV4cCI6MjA5MTk0MDk0NX0.iy0KSOyVY3PNN0PultgCjxSlG1mhxYfz4eRplOKG4qw';                // ← 여기 교체
+
+/* ── Supabase Sync ── */
+const SB={
+  client:null, timers:{}, pending:{},
+  keyMap:{
+    'an_note':'note','an_pris':'pris','an_dump':'dump','an_evs':'events',
+    'an_wtd':'workTd','an_btd':'bizTd','an_wek':'wek','an_spc':'space',
+    'an_asgn':'assigns','an_clk':'clinks','an_memo':'memos','an_drl':'drLogs',
+    'an_wkrt':'wkRt','an_mort':'moRt','an_wvchk':'wvChk'
+  },
+  status:(s)=>{
+    const el=document.getElementById('sync-status');
+    const lb=document.getElementById('sync-label');
+    if(!el)return;
+    const map={ok:'#2ecc71',saving:'#f39c12',offline:'#e74c3c',init:'#95a5a6'};
+    const lmap={ok:'동기화 완료',saving:'저장 중…',offline:'오프라인',init:'연결 중…'};
+    el.style.background=map[s]||'#95a5a6';
+    el.title=lmap[s]||'';
+    if(lb)lb.textContent=lmap[s]||'';
+  },
+  init:async()=>{
+    if(!SUPABASE_URL||SUPABASE_URL.includes('YOUR_')){SB.status('offline');document.getElementById('sync-label').textContent='설정 필요';return;}
+    try{
+      SB.client=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+      SB.status('init');
+      const{data,error}=await SB.client.from('data_store').select('key,value');
+      if(error)throw error;
+      let changed=false;
+      data.forEach(row=>{
+        const dKey=SB.keyMap[row.key];
+        if(dKey!==undefined){D[dKey]=row.value;localStorage.setItem(row.key,JSON.stringify(row.value));changed=true;}
+      });
+      if(changed)SB._rerender();
+      SB.status('ok');
+    }catch(e){
+      console.error('[SB]',e);SB.status('offline');
+    }
+  },
+  sync:(k,v)=>{
+    if(!SB.client)return;
+    SB.pending[k]=v;
+    clearTimeout(SB.timers[k]);
+    SB.timers[k]=setTimeout(()=>SB._flush(k),800);
+  },
+  _flush:async(k)=>{
+    if(!SB.client||SB.pending[k]===undefined)return;
+    const v=SB.pending[k];delete SB.pending[k];
+    try{
+      SB.status('saving');
+      await SB.client.from('data_store').upsert({key:k,value:v,updated_at:new Date().toISOString()},{onConflict:'key'});
+      if(!Object.keys(SB.pending).length)SB.status('ok');
+    }catch(e){
+      console.error('[SB flush]',e);SB.status('offline');
+    }
+  },
+  _rerender:()=>{
+    const np=document.getElementById('note-el');
+    if(np)np.textContent=D.note||'';
+    document.querySelectorAll('[data-pi]').forEach((el,i)=>{el.value=D.pris[i]||'';rz(el);});
+    renderDump();renderAllWork();renderAssigns();renderCLinks();renderMemos();
+    renderPast('personal');renderPast('creator');renderPast('analysis');
+    renderRoutines();
+    const pg=document.querySelector('.pg.on');
+    if(pg){const id=pg.id.replace('pg-','');
+      if(id==='today')renderTB();else if(id==='sch')renderSch();else if(id==='db')updateDB();}
+  }
+};
+
+const S={
+  g:(k,d)=>{try{const v=localStorage.getItem(k);return v!=null?JSON.parse(v):d;}catch{return d;}},
+  s:(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));}catch{};SB.sync(k,v);}
+};
+const D={
+  note:   S.g('an_note', ''),
+  pris:   S.g('an_pris', ['','','']),
+  dump:   S.g('an_dump', []),
+  events: S.g('an_evs',  {}),
+  workTd: S.g('an_wtd',  []),
+  bizTd:  S.g('an_btd',  []),
+  wek:    S.g('an_wek',  []),
+  space:  S.g('an_spc',  []),
+  assigns:S.g('an_asgn', []),
+  clinks: S.g('an_clk',  []),
+  memos:  S.g('an_memo', {urgent:[],ideas:[],later:[],links:[]}),
+  drLogs: S.g('an_drl',  {personal:[],creator:[],analysis:[]}),
+  wkRt:   S.g('an_wkrt', S.g('an_wrt', [])),
+  moRt:   S.g('an_mort', S.g('an_mrt', [])),
+  wvChk:  S.g('an_wvchk',{}),
+};
+
+/* ── UID & MIGRATION ── */
+const EMOJIS=['○','◎','●','◉','□','■','◇','◆','△','▲','▽','▼','☆','★','✦','✧','◐','◑','◒','◓','↻','↺','⊕','⊙','⊞','⊟','※','✓','✗','—','◈','◌'];
+let detailCtx={};
+function uid(){return Math.random().toString(36).slice(2,9)+Date.now().toString(36);}
+function ensureIds(arr){arr.forEach(it=>{if(!it.id)it.id=uid();});return arr;}
+function migrate(){
+  ensureIds(D.workTd);S.s('an_wtd',D.workTd);
+  ensureIds(D.bizTd);S.s('an_btd',D.bizTd);
+  ensureIds(D.assigns);S.s('an_asgn',D.assigns);
+  ensureIds(D.wkRt);S.s('an_wkrt',D.wkRt);
+  ensureIds(D.moRt);S.s('an_mort',D.moRt);
+  // Add IDs to events
+  let evChanged=false;
+  for(const date in D.events){
+    (D.events[date]||[]).forEach(ev=>{if(!ev.id){ev.id=uid();evChanged=true;}});
+  }
+  if(evChanged)S.s('an_evs',D.events);
+  // Migrate memos from strings to objects
+  let memoChanged=false;
+  ['urgent','ideas','later','links'].forEach(cat=>{
+    D.memos[cat]=D.memos[cat].map(it=>{
+      if(typeof it==='string'){memoChanged=true;return{id:uid(),text:it,detail:'',emoji:'○'};}
+      if(!it.id){it.id=uid();memoChanged=true;}
+      return it;
+    });
+  });
+  if(memoChanged)S.s('an_memo',D.memos);
+}
+
+/* ── DETAIL MODAL ── */
+function openDetailById(type,id){
+  let item,meta={};
+  if(type==='event'){
+    for(const date in D.events){
+      const found=(D.events[date]||[]).find(x=>x.id===id);
+      if(found){item=found;meta={date,time:s2t(found.s)+' – '+s2t(found.e)};break;}
+    }
+  } else if(type==='memo'){
+    for(const cat of['urgent','ideas','later','links']){
+      const found=D.memos[cat].find(x=>x&&x.id===id);
+      if(found){item=found;meta={cat};break;}
+    }
+  } else if(type==='workTd'||type==='bizTd'){
+    item=D[type].find(x=>x.id===id);
+  } else if(type==='assign'){
+    item=D.assigns.find(x=>x.id===id);
+    if(item&&item.due)meta={date:item.due};
+  } else if(type==='wkRt'){
+    item=D.wkRt.find(x=>x.id===id);
+    if(item&&item.time)meta={time:item.time};
+  } else if(type==='moRt'){
+    item=D.moRt.find(x=>x.id===id);
+    if(item&&item.time)meta={time:item.time};
+  }
+  if(item)openDetail(type,item,meta);
+}
+
+function openDetail(type,item,meta){
+  detailCtx={type,item,meta:meta||{}};
+  const title=item.title||item.name||item.text||'';
+  document.getElementById('dm-title-inp').value=title;
+  document.getElementById('dm-body-inp').value=item.detail||'';
+  document.getElementById('dm-emoji-btn').textContent=item.emoji||'○';
+  let mh='';
+  if(meta&&meta.time)mh+=`<span class="dm-meta-chip">◷ ${esc(meta.time)}</span>`;
+  if(meta&&meta.date)mh+=`<span class="dm-meta-chip">▫ ${esc(meta.date)}</span>`;
+  if(item.tag)mh+=`<span class="dm-meta-chip">${esc(item.tag)}</span>`;
+  document.getElementById('dm-meta-row').innerHTML=mh;
+  document.getElementById('dm-ep-wrap').innerHTML=EMOJIS.map(e=>`<button class="dm-ep-btn" onclick="pickEmoji('${e}')">${e}</button>`).join('');
+  document.getElementById('dm-ep-wrap').classList.remove('on');
+  document.getElementById('dm-saved-lbl').classList.remove('show');
+  document.getElementById('ov-detail').classList.add('on');
+  setTimeout(()=>document.getElementById('dm-title-inp').focus(),60);
+}
+
+function closeDetail(){
+  document.getElementById('ov-detail').classList.remove('on');
+  detailCtx={};
+}
+
+function toggleEmojiPick(){document.getElementById('dm-ep-wrap').classList.toggle('on');}
+
+function pickEmoji(e){
+  document.getElementById('dm-emoji-btn').textContent=e;
+  document.getElementById('dm-ep-wrap').classList.remove('on');
+  if(detailCtx.item)detailCtx.item.emoji=e;
+}
+
+function detailSave(){
+  if(!detailCtx.item)return;
+  const t=document.getElementById('dm-title-inp').value.trim();
+  const b=document.getElementById('dm-body-inp').value;
+  const em=document.getElementById('dm-emoji-btn').textContent;
+  const it=detailCtx.item;
+  it.detail=b; it.emoji=em;
+  const type=detailCtx.type;
+  if(type==='event'){
+    if(t)it.title=t;
+    S.s('an_evs',D.events);
+    if(document.getElementById('pg-today').classList.contains('on'))renderTB();
+    if(document.getElementById('pg-sch').classList.contains('on'))renderSch();
+  } else if(type==='memo'){
+    if(t)it.text=t;
+    S.s('an_memo',D.memos);renderMemos();
+  } else if(type==='workTd'){
+    if(t)it.name=t;S.s('an_wtd',D.workTd);renderAllWork();
+  } else if(type==='bizTd'){
+    if(t)it.name=t;S.s('an_btd',D.bizTd);renderAllWork();
+  } else if(type==='assign'){
+    if(t)it.name=t;S.s('an_asgn',D.assigns);renderAssigns();
+  } else if(type==='wkRt'){
+    if(t)it.name=t;S.s('an_wkrt',D.wkRt);renderRoutines();
+  } else if(type==='moRt'){
+    if(t)it.name=t;S.s('an_mort',D.moRt);renderRoutines();
+  }
+  const badge=document.getElementById('dm-saved-lbl');
+  badge.classList.add('show');
+  setTimeout(()=>badge.classList.remove('show'),2000);
+}
+
+function detailDelete(){
+  if(!detailCtx.item||!confirm('이 항목을 삭제할까요?'))return;
+  const{type,item,meta}=detailCtx;
+  if(type==='event'){
+    const date=meta.date;
+    D.events[date]=(D.events[date]||[]).filter(x=>x.id!==item.id);
+    S.s('an_evs',D.events);
+    if(document.getElementById('pg-today').classList.contains('on'))renderTB();
+    if(document.getElementById('pg-sch').classList.contains('on'))renderSch();
+  } else if(type==='memo'){
+    D.memos[meta.cat]=D.memos[meta.cat].filter(x=>x.id!==item.id);
+    S.s('an_memo',D.memos);renderMemos();
+  } else if(type==='workTd'){
+    D.workTd=D.workTd.filter(x=>x.id!==item.id);S.s('an_wtd',D.workTd);renderAllWork();
+  } else if(type==='bizTd'){
+    D.bizTd=D.bizTd.filter(x=>x.id!==item.id);S.s('an_btd',D.bizTd);renderAllWork();
+  } else if(type==='assign'){
+    D.assigns=D.assigns.filter(x=>x.id!==item.id);S.s('an_asgn',D.assigns);renderAssigns();
+  } else if(type==='wkRt'){
+    D.wkRt=D.wkRt.filter(x=>x.id!==item.id);S.s('an_wkrt',D.wkRt);renderRoutines();
+  } else if(type==='moRt'){
+    D.moRt=D.moRt.filter(x=>x.id!==item.id);S.s('an_mort',D.moRt);renderRoutines();
+  }
+  closeDetail();
+}
+const DKO=['일','월','화','수','목','금','토'];
+function p2(n){return String(n).padStart(2,'0');}
+function dk(d=new Date()){return `${d.getFullYear()}-${p2(d.getMonth()+1)}-${p2(d.getDate())}`;}
+function pd(s){const[y,m,dy]=s.split('-').map(Number);return new Date(y,m-1,dy);}
+function addD(d,n){const r=new Date(d);r.setDate(r.getDate()+n);return r;}
+function fmtLong(d){return `${d.getFullYear()}년 ${d.getMonth()+1}월 ${d.getDate()}일 (${DKO[d.getDay()]}요일)`;}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function rz(el){el.style.height='auto';el.style.height=el.scrollHeight+'px';}
+const EV_COLOR_N=8;
+function evCI(id){let h=0;for(let i=0;i<id.length;i++)h=(h*31+id.charCodeAt(i))&0xFFFF;return h%EV_COLOR_N;}
+
+function go(page){
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.nav').forEach(n=>n.classList.remove('on'));
+  document.getElementById('pg-'+page).classList.add('on');
+  const nEl=document.getElementById('n-'+page);if(nEl)nEl.classList.add('on');
+  if(page==='today'){renderTB();updateNowLine();}
+  if(page==='sch')  renderSch();
+  if(page==='db')   updateDB();
+  closeSb();  // auto-close sidebar on mobile after nav
+}
+
+/* ── MOBILE SIDEBAR TOGGLE ── */
+function toggleSb(){
+  const sb=document.getElementById('sb');
+  const bd=document.getElementById('sb-backdrop');
+  if(!sb)return;
+  const isOpen=sb.classList.toggle('open');
+  if(bd)bd.classList.toggle('on',isOpen);
+  document.body.style.overflow=isOpen?'hidden':'';
+}
+function closeSb(){
+  const sb=document.getElementById('sb');
+  const bd=document.getElementById('sb-backdrop');
+  if(sb)sb.classList.remove('open');
+  if(bd)bd.classList.remove('on');
+  document.body.style.overflow='';
+}
+// Close sidebar on resize back to desktop
+window.addEventListener('resize',()=>{
+  if(window.innerWidth>768)closeSb();
+});
+
+/* ── TIME BOXING ── */
+const SH=28,HSTART=5,HEND=25,NSLOTS=(HEND-HSTART)*4;
+function s2min(s){return HSTART*60+s*15;}
+function s2t(s){const m=s2min(s);return `${p2(Math.floor(m/60))}:${p2(m%60)}`;}
+function y2slot(y,rect){return Math.max(0,Math.min(NSLOTS-1,Math.floor((y-rect.top)/SH)));}
+let curDay=dk();
+function moveDay(n){curDay=dk(addD(pd(curDay),n));renderTB();}
+function gotoToday(){curDay=dk();renderTB();}
+const drag={on:false,s:null,c:null};
+let evCtx={};
+
+function buildAxis(){
+  const ax=document.getElementById('tb-axis');
+  ax.style.height=(NSLOTS*SH)+'px';
+  let h='';
+  for(let s=0;s<=NSLOTS;s++){
+    const top=s*SH,m=s2min(s),min=m%60;
+    if(min===0)      h+=`<div class="tb-ax-lbl"  style="top:${top}px">${p2(Math.floor(m/60))}:00</div>`;
+    else if(min===30)h+=`<div class="tb-ax-half" style="top:${top}px">${p2(Math.floor(m/60))}:30</div>`;
+  }
+  ax.innerHTML=h;
+}
+function renderTB(){
+  document.getElementById('today-label').textContent=fmtLong(pd(curDay));
+  const cont=document.getElementById('tb-content');
+  cont.style.height=(NSLOTS*SH)+'px';
+  let h='';
+  for(let s=0;s<NSLOTS;s++){
+    const top=s*SH,m=s2min(s)%60;
+    h+=`<div class="tb-hline ${m===0?'hour':m===30?'half':'quart'}" style="top:${top}px;height:${SH}px;"></div>`;
+  }
+  (D.events[curDay]||[]).forEach(ev=>{
+    const top=ev.s*SH,ht=Math.max(SH,(ev.e-ev.s)*SH),ci=evCI(ev.id);
+    h+=`<div class="tb-ev" data-ci="${ci}" style="top:${top}px;height:${ht}px"
+      onmousedown="event.stopPropagation()"
+      onclick="openDetailById('event','${ev.id}')">
+      <span class="ev-t">${ev.emoji?ev.emoji+' ':''}${esc(ev.title)}</span>
+      ${ht>SH?`<span class="ev-tm">${s2t(ev.s)} – ${s2t(ev.e)}</span>`:''}
+    </div>`;
+  });
+  if(drag.on&&drag.s!==null&&drag.c!==null){
+    const a=Math.min(drag.s,drag.c),b=Math.max(drag.s,drag.c)+1;
+    h+=`<div class="tb-drag-sel" style="top:${a*SH}px;height:${(b-a)*SH}px;"></div>`;
+  }
+  cont.innerHTML=h;
+  updateNowLine();
+}
+function updateNowLine(){
+  const cont=document.getElementById('tb-content');if(!cont)return;
+  const old=cont.querySelector('.tb-now');if(old)old.remove();
+  if(curDay!==dk())return;
+  const now=new Date(),slot=(now.getHours()*60+now.getMinutes()-HSTART*60)/15;
+  if(slot<0||slot>NSLOTS)return;
+  const div=document.createElement('div');div.className='tb-now';div.style.top=(slot*SH)+'px';
+  cont.appendChild(div);
+}
+function tbDown(e){
+  if(e.button!==0)return;
+  const rect=document.getElementById('tb-content').getBoundingClientRect();
+  drag.on=true;drag.s=y2slot(e.clientY,rect);drag.c=drag.s;e.preventDefault();
+}
+function tbMove(e){
+  if(!drag.on)return;
+  const ns=y2slot(e.clientY,document.getElementById('tb-content').getBoundingClientRect());
+  if(ns!==drag.c){drag.c=ns;renderTB();}
+}
+function tbUp(e){
+  if(!drag.on)return;
+  drag.c=y2slot(e.clientY,document.getElementById('tb-content').getBoundingClientRect());
+  const s=Math.min(drag.s,drag.c),en=Math.max(drag.s,drag.c)+1;
+  drag.on=false;drag.s=null;drag.c=null;renderTB();
+  openNewEv(curDay,s,en);
+}
+function tbLeave(e){if(drag.on&&e.buttons===0){drag.on=false;drag.s=null;drag.c=null;renderTB();}}
+
+function openNewEv(date,s,e){
+  evCtx={mode:'new',date,s,e};
+  document.getElementById('ev-mod-h').textContent='일정 추가';
+  document.getElementById('ev-mod-t').textContent=`${s2t(s)} – ${s2t(e)}`;
+  document.getElementById('ev-name').value='';
+  document.getElementById('ev-del-btn').style.display='none';
+  document.getElementById('ov-ev').classList.add('on');
+  setTimeout(()=>document.getElementById('ev-name').focus(),60);
+}
+function openEditEv(ev,date,id){
+  // Legacy — now handled by detail modal
+  openDetailById('event',id);
+}
+function openWvNewEv(dKey){
+  evCtx={mode:'new',date:dKey,s:8,e:12};
+  document.getElementById('ev-mod-h').textContent='일정 추가';
+  document.getElementById('ev-mod-t').textContent=fmtLong(pd(dKey));
+  document.getElementById('ev-name').value='';
+  document.getElementById('ev-del-btn').style.display='none';
+  document.getElementById('ov-ev').classList.add('on');
+  setTimeout(()=>document.getElementById('ev-name').focus(),60);
+}
+function closeEvMod(){document.getElementById('ov-ev').classList.remove('on');evCtx={};}
+function saveEv(){
+  const title=document.getElementById('ev-name').value.trim();
+  if(!title){closeEvMod();return;}
+  if(!D.events[evCtx.date])D.events[evCtx.date]=[];
+  D.events[evCtx.date].push({id:uid(),s:evCtx.s,e:evCtx.e,title,detail:'',emoji:'○'});
+  S.s('an_evs',D.events);closeEvMod();
+  if(document.getElementById('pg-today').classList.contains('on'))renderTB();
+  if(document.getElementById('pg-sch').classList.contains('on'))renderSch();
+}
+function deleteEv(){
+  D.events[evCtx.date]=(D.events[evCtx.date]||[]).filter(x=>x.id!==evCtx.id);
+  S.s('an_evs',D.events);closeEvMod();
+  if(document.getElementById('pg-today').classList.contains('on'))renderTB();
+  if(document.getElementById('pg-sch').classList.contains('on'))renderSch();
+}
+function wvToggleDone(dKey,id){
+  if(!D.wvChk[dKey])D.wvChk[dKey]={};
+  D.wvChk[dKey][id]=!D.wvChk[dKey][id];
+  S.s('an_wvchk',D.wvChk);renderWeek();
+}
+function wvDelEv(dKey,id){
+  D.events[dKey]=(D.events[dKey]||[]).filter(x=>x.id!==id);
+  S.s('an_evs',D.events);renderWeek();
+}
+
+/* ── SCHEDULE ── */
+let schView='week',schRef=new Date();
+function setView(v){
+  schView=v;
+  document.getElementById('vt-wk').classList.toggle('on',v==='week');
+  document.getElementById('vt-mo').classList.toggle('on',v==='month');
+  document.getElementById('wv').style.display=v==='week'?'flex':'none';
+  document.getElementById('mv').style.display=v==='month'?'flex':'none';
+  renderSch();
+}
+function schPrev(){if(schView==='week')schRef=addD(schRef,-7);else schRef=new Date(schRef.getFullYear(),schRef.getMonth()-1,1);renderSch();}
+function schNext(){if(schView==='week')schRef=addD(schRef,7);else schRef=new Date(schRef.getFullYear(),schRef.getMonth()+1,1);renderSch();}
+function schToday(){schRef=new Date();renderSch();}
+function renderSch(){if(schView==='week')renderWeek();else renderMonth();}
+function wkStart(d){const r=new Date(d);r.setDate(r.getDate()-r.getDay());return r;}
+
+function renderWeek(){
+  const ws=wkStart(schRef),we=addD(ws,6);
+  document.getElementById('sch-label').textContent=
+    `${ws.getFullYear()}년 ${ws.getMonth()+1}월 ${ws.getDate()}일 – ${we.getMonth()+1}월 ${we.getDate()}일`;
+  const todayStr=dk();
+  let html='';
+  for(let i=0;i<7;i++){
+    const d=addD(ws,i),dKey=dk(d),isToday=dKey===todayStr;
+    const evs=D.events[dKey]||[],chk=D.wvChk[dKey]||{};
+    let chips='';
+    evs.forEach(ev=>{
+      const done=!!chk[ev.id];
+      chips+=`<div class="wv-ev-chip ${done?'done-chip':''}" onclick="openDetailById('event','${ev.id}')">
+        <div class="wv-chip-cb" onclick="event.stopPropagation();wvToggleDone('${dKey}','${ev.id}')">${done?'✓':''}</div>
+        <span class="wv-chip-txt">${ev.emoji?ev.emoji+' ':''}${esc(ev.title)}</span>
+        <button class="wv-chip-del" onclick="event.stopPropagation();wvDelEv('${dKey}','${ev.id}')">✕</button>
+      </div>`;
+    });
+    html+=`<div class="wv-day-col ${isToday?'today-col':''}">
+      <div class="wv-day-hd" onclick="jumpToDay('${dKey}')">
+        <div class="wd-name">${DKO[d.getDay()]}요일</div>
+        <div class="wd-num">${d.getDate()}</div>
+      </div>
+      <div class="wv-day-body">${chips}</div>
+      <div class="wv-add-row"><button class="wv-add-btn" onclick="openWvNewEv('${dKey}')">+ 추가</button></div>
+    </div>`;
+  }
+  document.getElementById('wv-grid').innerHTML=html;
+}
+function jumpToDay(dKey){curDay=dKey;go('today');}
+
+function renderMonth(){
+  const y=schRef.getFullYear(),mo=schRef.getMonth();
+  document.getElementById('sch-label').textContent=`${y}년 ${mo+1}월`;
+  const first=new Date(y,mo,1),start=wkStart(first),todayStr=dk();
+  let h='';
+  for(let w=0;w<6;w++){
+    for(let d=0;d<7;d++){
+      const day=addD(start,w*7+d),dKey=dk(day);
+      const inMo=day.getMonth()===mo,isTd=dKey===todayStr;
+      const evs=D.events[dKey]||[];
+      let evH=evs.slice(0,4).map(ev=>`<div class="mv-ev">${esc(ev.title)}</div>`).join('');
+      if(evs.length>4)evH+=`<div class="mv-more">+${evs.length-4}개 더</div>`;
+      h+=`<div class="mv-cell ${isTd?'today-cell':''} ${!inMo?'dim':''}" onclick="monthClick('${dKey}')">
+        <div class="mv-num">${day.getDate()}</div>${evH}
+      </div>`;
+    }
+  }
+  document.getElementById('mv-body').innerHTML=h;
+}
+function monthClick(dKey){curDay=dKey;go('today');}
+
+/* ── LEFT PANEL ── */
+function savePri(){document.querySelectorAll('[data-pi]').forEach((el,i)=>D.pris[i]=el.value);S.s('an_pris',D.pris);}
+function renderDump(){
+  document.getElementById('dump-list').innerHTML=D.dump.map((t,i)=>`
+    <div class="dump-row"><div class="dump-dot"></div>
+    <textarea class="ita" rows="1" oninput="rz(this);D.dump[${i}]=this.value" onblur="S.s('an_dump',D.dump)">${esc(t)}</textarea>
+    <button class="dx" onclick="rmDump(${i})">✕</button></div>`).join('');
+  document.querySelectorAll('#dump-list textarea').forEach(rz);
+}
+function addDump(){D.dump.push('');S.s('an_dump',D.dump);renderDump();const es=document.querySelectorAll('#dump-list textarea');if(es.length)es[es.length-1].focus();}
+function rmDump(i){D.dump.splice(i,1);S.s('an_dump',D.dump);renderDump();}
+
+/* ── WORK ── */
+function renderTdList(elId,arr,key){
+  document.getElementById(elId).innerHTML=arr.length?arr.map((it,i)=>`
+    <div class="td-row ${it.done?'done':''}">
+      <div class="td-box" onclick="toggleTd('${key}',${i})" style="cursor:pointer;">${it.done?'✓':''}</div>
+      <span style="flex:1;font-size:13px;cursor:pointer;" onclick="openDetailById('${key}','${it.id}')">${it.emoji?it.emoji+' ':''}${esc(it.name)}</span>
+      <span class="td-badge">${esc(it.tag)}</span>
+      <button class="dx" onclick="event.stopPropagation();rmTd('${key}',${i})">✕</button>
+    </div>`).join(''):'<p style="color:var(--t3);font-size:12px;padding:8px 0;">항목이 없어요</p>';
+}
+function toggleTd(k,i){D[k][i].done=!D[k][i].done;S.s('an_'+k,D[k]);renderAllWork();}
+function rmTd(k,i){D[k].splice(i,1);S.s('an_'+k,D[k]);renderAllWork();}
+function renderIdeaList(elId,arr,key){
+  document.getElementById(elId).innerHTML=arr.map((t,i)=>`
+    <div class="dump-row"><div class="dump-dot"></div>
+    <textarea class="ita" rows="1" oninput="rz(this);D.${key}[${i}]=this.value" onblur="S.s('an_${key}',D.${key})">${esc(t)}</textarea>
+    <button class="dx" onclick="rmIdea('${key}',${i})">✕</button></div>`).join('');
+  document.querySelectorAll(`#${elId} textarea`).forEach(rz);
+}
+function rmIdea(key,i){D[key].splice(i,1);S.s('an_'+key,D[key]);renderAllWork();}
+function addIdea(w){
+  const key=w==='wek'?'wek':'space';D[key].push('');S.s('an_'+key,D[key]);
+  renderIdeaList(w+'-list',D[key],key);
+  const es=document.querySelectorAll(`#${w}-list textarea`);if(es.length)es[es.length-1].focus();
+}
+function renderAllWork(){
+  renderTdList('work-todos',D.workTd,'workTd');renderTdList('biz-todos',D.bizTd,'bizTd');
+  renderIdeaList('wek-list',D.wek,'wek');renderIdeaList('space-list',D.space,'space');
+}
+let tdCtx='work';
+function openTodoMod(c){tdCtx=c;document.getElementById('td-name').value='';document.getElementById('ov-td').classList.add('on');setTimeout(()=>document.getElementById('td-name').focus(),60);}
+function closeTodoMod(){document.getElementById('ov-td').classList.remove('on');}
+function saveTodo(){
+  const name=document.getElementById('td-name').value.trim(),tag=document.getElementById('td-tag').value;
+  if(!name)return;
+  const key=tdCtx==='work'?'workTd':'bizTd';
+  D[key].push({id:uid(),name,tag,done:false,detail:'',emoji:'◇'});
+  S.s('an_'+key,D[key]);
+  closeTodoMod();renderAllWork();
+}
+
+/* ── STUDY ── */
+function renderAssigns(){
+  document.getElementById('assign-list').innerHTML=D.assigns.length?D.assigns.map((a,i)=>`
+    <div class="td-row ${a.done?'done':''}">
+      <div class="td-box" onclick="toggleAsgn(${i})" style="cursor:pointer;">${a.done?'✓':''}</div>
+      <span style="flex:1;font-size:13px;cursor:pointer;" onclick="openDetailById('assign','${a.id}')">${a.emoji?a.emoji+' ':''}${esc(a.name)}</span>
+      ${a.due?`<span class="td-badge">${a.due}</span>`:''}
+      <button class="dx" onclick="event.stopPropagation();rmAsgn(${i})">✕</button>
+    </div>`).join(''):'<p style="color:var(--t3);font-size:12px;padding:8px 0;">과제가 없어요</p>';
+}
+function toggleAsgn(i){D.assigns[i].done=!D.assigns[i].done;S.s('an_asgn',D.assigns);renderAssigns();}
+function rmAsgn(i){D.assigns.splice(i,1);S.s('an_asgn',D.assigns);renderAssigns();}
+function openAssignMod(){document.getElementById('as-name').value='';document.getElementById('as-due').value='';document.getElementById('ov-as').classList.add('on');setTimeout(()=>document.getElementById('as-name').focus(),60);}
+function closeAssignMod(){document.getElementById('ov-as').classList.remove('on');}
+function saveAssign(){
+  const name=document.getElementById('as-name').value.trim(),due=document.getElementById('as-due').value;
+  if(!name)return;
+  D.assigns.push({id:uid(),name,due,done:false,detail:'',emoji:'△'});
+  S.s('an_asgn',D.assigns);closeAssignMod();renderAssigns();
+}
+function renderCLinks(){
+  document.getElementById('custom-links').innerHTML=D.clinks.map((lk,i)=>`
+    <div class="lk-item">
+      <div class="lk-ic" style="font-size:10px;">${esc(lk.name).charAt(0).toUpperCase()}</div>
+      <div style="flex:1;min-width:0;">
+        <a href="${esc(lk.url)}" target="_blank" style="font-weight:700;font-size:13px;color:var(--t1);">${esc(lk.name)}</a>
+        <div style="font-size:11px;color:var(--t3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(lk.url)}</div>
+      </div>
+      <button class="dx" style="opacity:1;" onclick="rmCLink(${i})">✕</button>
+    </div>`).join('');
+}
+function openLinkMod(){document.getElementById('lk-name').value='';document.getElementById('lk-url').value='';document.getElementById('ov-lk').classList.add('on');setTimeout(()=>document.getElementById('lk-name').focus(),60);}
+function closeLinkMod(){document.getElementById('ov-lk').classList.remove('on');}
+function saveLink(){
+  const name=document.getElementById('lk-name').value.trim(),url=document.getElementById('lk-url').value.trim();
+  if(!name||!url)return;D.clinks.push({name,url});S.s('an_clk',D.clinks);closeLinkMod();renderCLinks();
+}
+function rmCLink(i){D.clinks.splice(i,1);S.s('an_clk',D.clinks);renderCLinks();}
+
+/* ── MEMO ── */
+function renderMemos(){
+  ['urgent','ideas','later','links'].forEach(cat=>{
+    document.getElementById('m-'+cat).innerHTML=D.memos[cat].map((it,i)=>{
+      const text=it.text||'';
+      return `<div class="memo-card" onclick="openDetailById('memo','${it.id}')">
+        <span class="memo-card-emoji">${it.emoji||'📝'}</span>
+        <span class="memo-card-text ${text?'':'empty'}">${text?esc(text):'(빈 메모)'}</span>
+        <button class="memo-card-del" onclick="event.stopPropagation();rmMemo('${cat}',${i})">✕</button>
+      </div>`;
+    }).join('');
+  });
+}
+function addMemo(cat){
+  const newItem={id:uid(),text:'',detail:'',emoji:'○'};
+  D.memos[cat].push(newItem);
+  S.s('an_memo',D.memos);
+  renderMemos();
+  // 새 메모는 바로 detail 팝업 오픈
+  openDetail('memo',newItem,{cat});
+}
+function rmMemo(cat,i){D.memos[cat].splice(i,1);S.s('an_memo',D.memos);renderMemos();}
+
+/* ── DAILY RECORD ── */
+function drTab(t,el){
+  document.querySelectorAll('.dr-tab').forEach(b=>b.classList.remove('on'));el.classList.add('on');
+  document.querySelectorAll('.dr-panel').forEach(p=>p.classList.remove('on'));
+  document.getElementById('dr-'+t).classList.add('on');
+}
+function saveDR(type){
+  let entry={date:fmtLong(new Date()),dk:dk()};
+  if(type==='personal'){
+    Object.assign(entry,{quote:document.getElementById('p-quote').value.trim(),done:document.getElementById('p-done').value.trim(),thoughts:document.getElementById('p-thoughts').value.trim(),mvp:document.getElementById('p-mvp').value.trim(),energy:document.getElementById('p-energy').value,sleep:document.getElementById('p-sleep').value.trim()});
+    if(!entry.quote&&!entry.done&&!entry.thoughts){alert('내용을 입력해주세요!');return;}
+    ['p-quote','p-done','p-thoughts','p-mvp','p-energy','p-sleep'].forEach(id=>document.getElementById(id).value='');
+  }else if(type==='creator'){
+    Object.assign(entry,{content:document.getElementById('c-content').value.trim(),result:document.getElementById('c-result').value.trim(),next:document.getElementById('c-next').value.trim()});
+    if(!entry.content){alert('내용을 입력해주세요!');return;}
+    ['c-content','c-result','c-next'].forEach(id=>document.getElementById(id).value='');
+  }else{
+    Object.assign(entry,{topic:document.getElementById('a-topic').value.trim(),insight:document.getElementById('a-insight').value.trim(),action:document.getElementById('a-action').value.trim()});
+    if(!entry.topic){alert('내용을 입력해주세요!');return;}
+    ['a-topic','a-insight','a-action'].forEach(id=>document.getElementById(id).value='');
+  }
+  D.drLogs[type].unshift(entry);S.s('an_drl',D.drLogs);renderPast(type);
+}
+function renderPast(type){
+  const id={personal:'p-past',creator:'c-past',analysis:'a-past'}[type];
+  const logs=D.drLogs[type],c=document.getElementById(id);
+  if(!logs.length){c.innerHTML='<p style="color:var(--t3);font-size:12px;text-align:center;padding:20px 0;">기록이 없어요</p>';return;}
+  c.innerHTML=logs.map((l,i)=>{
+    let body='';
+    if(type==='personal'){
+      body=`${l.quote?`<p style="font-size:13px;font-style:italic;color:var(--t2);margin-bottom:6px;">"${esc(l.quote)}"</p>`:''}
+        ${l.done?`<div style="font-size:12px;margin-bottom:5px;color:var(--t1);">${esc(l.done).replace(/\n/g,'<br>')}</div>`:''}
+        ${l.thoughts?`<div style="font-size:12px;margin-bottom:5px;color:var(--t2);">${esc(l.thoughts)}</div>`:''}
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;">
+          ${l.mvp?`<span style="font-size:11px;padding:3px 8px;border:1.5px solid var(--line);border-radius:99px;color:var(--t2);">★ ${esc(l.mvp)}</span>`:''}
+          ${l.energy?`<span style="font-size:11px;padding:3px 8px;border:1.5px solid var(--line);border-radius:99px;color:var(--t2);">에너지 ${l.energy}/10</span>`:''}
+          ${l.sleep?`<span style="font-size:11px;padding:3px 8px;border:1.5px solid var(--line);border-radius:99px;color:var(--t2);">수면 ${esc(l.sleep)}</span>`:''}
+        </div>`;
+    }else if(type==='creator'){
+      body=`${l.content?`<div style="font-size:12px;margin-bottom:4px;"><b>콘텐츠</b> ${esc(l.content)}</div>`:''}
+        ${l.result?`<div style="font-size:12px;margin-bottom:4px;"><b>성과</b> ${esc(l.result)}</div>`:''}
+        ${l.next?`<div style="font-size:12px;"><b>다음</b> ${esc(l.next)}</div>`:''}`;
+    }else{
+      body=`${l.topic?`<div style="font-size:12px;margin-bottom:4px;"><b>주제</b> ${esc(l.topic)}</div>`:''}
+        ${l.insight?`<div style="font-size:12px;margin-bottom:4px;"><b>인사이트</b> ${esc(l.insight)}</div>`:''}
+        ${l.action?`<div style="font-size:12px;"><b>액션</b> ${esc(l.action)}</div>`:''}`;
+    }
+    return `<div class="log-entry"><div style="display:flex;justify-content:space-between;align-items:center;"><div class="log-date">${l.date}</div><button style="background:none;border:none;color:#C92A2A;font-size:11px;font-weight:700;cursor:pointer;" onclick="rmLog('${type}',${i})">삭제</button></div>${body}</div>`;
+  }).join('');
+}
+function rmLog(type,i){if(!confirm('삭제할까요?'))return;D.drLogs[type].splice(i,1);S.s('an_drl',D.drLogs);renderPast(type);}
+
+/* ── ROUTINE ── */
+function renderRoutines(){
+  [{el:'wk-rt',key:'wkRt'},{el:'mo-rt',key:'moRt'}].forEach(({el,key})=>{
+    document.getElementById(el).innerHTML=D[key].length?D[key].map((rt,i)=>`
+      <div class="td-row ${rt.done?'done':''}">
+        <div class="td-box" onclick="toggleRt('${key}',${i})" style="cursor:pointer;">${rt.done?'✓':''}</div>
+        <span style="flex:1;font-size:13px;cursor:pointer;" onclick="openDetailById('${key}','${rt.id}')">${rt.emoji?rt.emoji+' ':''}${esc(rt.name)}</span>
+        ${rt.time?`<span class="td-badge">${esc(rt.time)}</span>`:''}
+        <button class="dx" onclick="event.stopPropagation();rmRt('${key}',${i})">✕</button>
+      </div>`).join(''):'<p style="color:var(--t3);font-size:12px;padding:8px 0;">루틴이 없어요</p>';
+  });
+}
+function toggleRt(key,i){D[key][i].done=!D[key][i].done;S.s('an_'+key.toLowerCase(),D[key]);renderRoutines();}
+function rmRt(key,i){D[key].splice(i,1);S.s('an_'+key.toLowerCase(),D[key]);renderRoutines();}
+let rtCtx='week';
+function openRtMod(c){rtCtx=c;document.getElementById('rt-name').value='';document.getElementById('rt-time').value='';document.getElementById('ov-rt').classList.add('on');setTimeout(()=>document.getElementById('rt-name').focus(),60);}
+function closeRtMod(){document.getElementById('ov-rt').classList.remove('on');}
+function saveRt(){
+  const name=document.getElementById('rt-name').value.trim(),time=document.getElementById('rt-time').value.trim();
+  if(!name)return;
+  const key=rtCtx==='week'?'wkRt':'moRt';
+  const storKey=key==='wkRt'?'an_wkrt':'an_mort';
+  D[key].push({id:uid(),name,time,done:false,detail:'',emoji:'↻'});
+  S.s(storKey,D[key]);closeRtMod();renderRoutines();
+}
+
+/* ── DATABASE ── */
+function updateDB(){
+  const evCnt=Object.values(D.events).reduce((a,arr)=>a+arr.length,0);
+  const memoCnt=Object.values(D.memos).reduce((a,arr)=>a+arr.length,0);
+  const logCnt=Object.values(D.drLogs).reduce((a,arr)=>a+arr.length,0);
+  document.getElementById('db-c1').textContent=(D.workTd.length+D.bizTd.length)+'개';
+  document.getElementById('db-c2').textContent=evCnt+'개';
+  document.getElementById('db-c3').textContent=(D.wkRt.length+D.moRt.length)+'개';
+  document.getElementById('db-c4').textContent=memoCnt+'개';
+  document.getElementById('db-c5').textContent=logCnt+'개';
+  document.getElementById('db-c6').textContent=(D.wek.length+D.space.length)+'개';
+}
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){closeEvMod();closeTodoMod();closeAssignMod();closeLinkMod();closeRtMod();closeDetail();}
+  if(e.key==='Enter'){
+    if(document.getElementById('ov-ev').classList.contains('on')){e.preventDefault();saveEv();}
+    if(document.getElementById('ov-td').classList.contains('on')){e.preventDefault();saveTodo();}
+    if(document.getElementById('ov-as').classList.contains('on')){e.preventDefault();saveAssign();}
+    if(document.getElementById('ov-rt').classList.contains('on')){e.preventDefault();saveRt();}
+  }
+  // Ctrl/Cmd+S로 detail 저장
+  if((e.ctrlKey||e.metaKey)&&e.key==='s'){
+    if(document.getElementById('ov-detail').classList.contains('on')){e.preventDefault();detailSave();}
+  }
+});
+document.getElementById('tb-content').addEventListener('selectstart',e=>e.preventDefault());
+
+(function init(){
+  migrate();
+  const noteEl=document.getElementById('note-el');
+  noteEl.textContent=D.note||'';
+  noteEl.addEventListener('blur',()=>{D.note=noteEl.textContent.trim();S.s('an_note',D.note);});
+  document.querySelectorAll('[data-pi]').forEach((el,i)=>{el.value=D.pris[i]||'';rz(el);});
+  renderDump();
+  document.getElementById('dr-today').textContent=fmtLong(new Date());
+  buildAxis();
+  renderTB();
+  setTimeout(()=>{
+    const now=new Date(),slot=(now.getHours()*60+now.getMinutes()-HSTART*60)/15-3;
+    document.getElementById('tb-right').scrollTop=Math.max(0,slot*SH);
+  },120);
+  setInterval(updateNowLine,60000);
+  renderAllWork();renderAssigns();renderCLinks();renderMemos();
+  renderPast('personal');renderPast('creator');renderPast('analysis');
+  renderRoutines();
+  SB.init();
+})();
+</script>
+</body>
+</html>
